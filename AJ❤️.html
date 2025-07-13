@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJ❤️</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #1a2a6c);
+        }
+        
+        /* Photo background with overlay */
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: url('https://i.postimg.cc/m2mDV15J/bg.png') no-repeat center center;
+            background-size: cover;
+            filter: brightness(0.9);
+            transition: filter 0.5s ease;
+        }
+        
+        .glass-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(173, 57, 112, 0.3), rgba(94, 55, 111, 0.4));
+            backdrop-filter: blur(10px);
+            z-index: 2;
+            transition: all 0.5s ease;
+        }
+        
+        /* Scene container */
+        .scene {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            perspective: 1200px;
+        }
+        
+        /* Envelope styling */
+        .envelope-container {
+            position: absolute;
+            width: 320px;
+            height: 200px;
+            transform-style: preserve-3d;
+            transition: transform 0.6s ease, opacity 0.5s ease;
+            z-index: 20;
+        }
+        
+        .envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+        
+        .envelope-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #d5a86a, #e8c38c);
+            border-radius: 8px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        
+        .envelope-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e8c38c, #f5d9aa);
+            border-radius: 8px;
+            z-index: 3;
+            transform-origin: bottom;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        
+        .envelope-flap {
+            position: absolute;
+            top: -100px;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-left: 160px solid transparent;
+            border-right: 160px solid transparent;
+            border-bottom: 100px solid #f5e1b0;
+            transform-origin: top;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 5;
+        }
+        
+        /* Transparent glassmorphic letter styling */
+        .letter {
+            position: absolute;
+            width: 300px;
+            height: 380px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 
+                0 8px 32px rgba(31, 38, 135, 0.2),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            transform: translateY(100px) scale(0.9);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s;
+            overflow: auto;
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .letter-header {
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            position: relative;
+        }
+        
+        .letter-header h2 {
+            font-family: 'Georgia', serif;
+            font-weight: 700;
+            font-size: 28px;
+            color: #fff;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .letter-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.5), transparent);
+        }
+        
+        .letter-content {
+            line-height: 1.7;
+            color: #fff;
+            font-size: 17px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .letter-content p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .signature {
+            margin-top: 30px;
+            font-style: italic;
+            text-align: right;
+            font-family: 'Georgia', serif;
+            font-size: 22px;
+            color: #fff;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Decorative elements */
+        .seal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: #c33;
+            border-radius: 50%;
+            z-index: 4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-family: 'Georgia', serif;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        /* Open states */
+        .open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+        
+        .open .envelope-front {
+            transform: rotateX(180deg);
+        }
+        
+        .open .letter {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        
+        .open .seal {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0);
+        }
+        
+        /* Envelope fade out */
+        .fade-out {
+            opacity: 0 !important;
+            visibility: hidden;
+            transition: opacity 0.5s ease 0.5s, visibility 0.5s ease 0.5s;
+        }
+        
+        /* Final letter state */
+        .final .letter {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            width: 85%;
+            max-width: 600px;
+            height: auto;
+            max-height: 85vh;
+            padding: 40px;
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.4),
+                inset 0 0 30px rgba(255, 255, 255, 0.15);
+            transition: all 0.8s ease 0.5s;
+            z-index: 30;
+        }
+        
+        /* Continuous floating hearts */
+        .continuous-hearts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            color: rgba(255, 105, 180, 0.7);
+            font-size: 24px;
+            pointer-events: none;
+            animation: floatUp 15s linear infinite;
+            bottom: -50px;
+            opacity: 0;
+        }
+        
+        /* Footer styling */
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            z-index: 40;
+        }
+        
+        /* Instructions */
+        .instructions {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            z-index: 40;
+            opacity: 0;
+            animation: fadeIn 2s 1s forwards;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Animations */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .scene {
+                height: 90vh;
+            }
+            
+            .letter {
+                width: 90%;
+                height: 70vh;
+                padding: 25px;
+            }
+            
+            .envelope-container {
+                transform: scale(0.8);
+            }
+            
+            .final .letter {
+                width: 95%;
+                padding: 25px;
+            }
+            
+            .letter-content {
+                font-size: 16px;
+                font-weight: bold;
+
+            }
+            
+            .signature {
+                font-size: 20px;
+            }
+            
+            .instructions {
+                font-size: 14px;
+                padding: 0 15px;
+            }
+        }
+        
+        /* Heart cursor */
+        body.heart-cursor {
+            cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23ff6b6b' d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E"), auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Photo background -->
+    <div class="background" id="background"></div>
+    <div class="glass-overlay"></div>
+    
+    <!-- Continuous floating hearts -->
+    <div class="continuous-hearts" id="continuous-hearts"></div>
+    
+    <!-- Scene container -->
+    <div class="scene">
+        <!-- Envelope -->
+        <div class="envelope-container">
+            <div class="envelope">
+                <div class="envelope-back"></div>
+                <div class="envelope-front"></div>
+                <div class="envelope-flap"></div>
+                <div class="seal">❤️</div>
+            </div>
+        </div>
+        
+        <!-- Inside the existing letter -->
+<div class="letter">
+    <div class="letter-header">
+        <h2>Hey Alice,</h2>
+    </div>
+    <div class="letter-content">
+        <p>There’s something I’ve been meaning to tell you not to complicate things, but to finally speak from my heart without holding back.</p>
+        
+        <p>Since we found our way back into each other’s lives, something in me shifted. It’s like I found a piece of peace I didn’t know I was still searching for. Just hearing from you, talking to you, even thinking of you… it’s like the world gets quieter and more beautiful for a moment.</p>
+        
+        <p>You’re more than just someone I care about. You’re someone I admire deeply your kindness, your humor, your ambition, the way your eyes light up when you smile. You’ve become someone I dream of having by my side, not just as a passing thought, but in the most serious, real way. When the time is right, I wouldn’t hesitate to ask for your hand. That vision of one day calling you mine, taking you home to share life together it’s one of my deepest hopes.</p>
+        
+        <p>But at the same time… I’ve been struggling. Some days, the silence between us makes my heart race with doubt, breaks something in me. I lose sleep. I get stuck in thoughts that spiral. I’ve even thought about disappearing blocking you, pushing myself away not because I want to forget you, but because I don’t know how to carry the weight of wanting something so deeply and not knowing if it’s ever going to be mine.</p>
+        
+        <p>But then I remember your smile, your voice, the light you bring. And somehow, I hang on even if it’s just by holding onto a photo of you, or the memory of how you welcomed me so warmly. It reminds me that whatever this is, it’s real to me. And that’s worth something.</p>
+        
+        <p>I’m not asking for answers, or promises. I just needed to say it honestly, openly, fully. Because you’re worth every word, and this isn’t just a passing crush for me.</p>
+
+        <p class="signature">chilloh❤️</p>
+    </div>
+</div>
+    </div>
+    
+
+    
+    <div class="footer">
+        Made with <i class="fas fa-heart" style="color: #ff6b6b;"></i> for someone special
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const envelopeContainer = document.querySelector('.envelope-container');
+            const scene = document.querySelector('.scene');
+            const letter = document.querySelector('.letter');
+            const continuousHearts = document.getElementById('continuous-hearts');
+            const background = document.getElementById('background');
+            
+            // Create continuous floating hearts
+            function createContinuousHearts() {
+                const heart = document.createElement('div');
+                heart.classList.add('floating-heart');
+                heart.innerHTML = '❤️';
+                
+                // Random size
+                const size = Math.random() * 2 + 1.5;
+                heart.style.fontSize = `${size}em`;
+                
+                // Random horizontal position
+                heart.style.left = `${Math.random() * 100}%`;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 20 + 15;
+                const delay = Math.random() * 5;
+                heart.style.animationDuration = `${duration}s`;
+                heart.style.animationDelay = `${delay}s`;
+                
+                // Random horizontal movement
+                const xMovement = Math.random() * 200 - 100;
+                heart.style.setProperty('--x-movement', `${xMovement}px`);
+                
+                continuousHearts.appendChild(heart);
+                
+                // Remove heart after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }
+            
+            // Generate continuous hearts
+            setInterval(createContinuousHearts, 300);
+            
+            // Create initial hearts
+            for (let i = 0; i < 20; i++) {
+                setTimeout(createContinuousHearts, i * 200);
+            }
+            
+            // Add open class to envelope after a short delay
+            setTimeout(() => {
+                envelopeContainer.classList.add('open');
+                scene.classList.add('open');
+                
+                // After envelope is fully open, fade it out quickly
+                setTimeout(() => {
+                    envelopeContainer.classList.add('fade-out');
+                    
+                    // After fade out, make letter expand to full size
+                    setTimeout(() => {
+                        scene.classList.add('final');
+                        document.body.classList.add('heart-cursor');
+                    }, 500);
+                }, 800);
+            }, 500);
+            
+            // Create love emojis on click
+            document.body.addEventListener('click', function(e) {
+                createHeart(e.clientX, e.clientY);
+            });
+            
+            // Create love emojis on touch
+            document.body.addEventListener('touchstart', function(e) {
+                createHeart(e.touches[0].clientX, e.touches[0].clientY);
+            });
+            
+            // Function to create floating hearts
+            function createHeart(x, y) {
+                const heart = document.createElement('div');
+                heart.classList.add('floating-heart');
+                heart.innerHTML = '❤️';
+                heart.style.left = `${x}px`;
+                heart.style.top = `${y}px`;
+                
+                // Random size
+                const size = Math.random() * 2 + 1.5;
+                heart.style.fontSize = `${size}em`;
+                
+                // Random animation duration
+                const duration = Math.random() * 5 + 10;
+                heart.style.animationDuration = `${duration}s`;
+                
+                // Random horizontal movement
+                const xMovement = Math.random() * 200 - 100;
+                heart.style.setProperty('--x-movement', `${xMovement}px`);
+                
+                document.body.appendChild(heart);
+                
+                // Remove heart after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                }, duration * 1000);
+            }
+        });
+    </script>
+</body>
+</html>
