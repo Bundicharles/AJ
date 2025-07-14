@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Calendar Progress Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      background-color: rgb(19, 255, 255);
+    }
+
+    h1, #monthYear {
+      text-align: center;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      margin-top: 10px;
+    }
+
+    .day {
+      width: 100%;
+      padding: 10px 0;
+      text-align: center;
+      border: 1px solid #636161;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: rgb(49, 34, 90);
+      color: #4CAF50;
+      font-weight: bold;
+    }
+
+    .day.inactive {
+      background-color: #3df30f;
+      color: #ec0f0f;
+      cursor: default;
+    }
+
+    .calendar-header {
+      font-weight: bold;
+      text-align: center;
+      padding: 5px 0;
+    }
+
+    #streak {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 1.2em;
+      color: #fd0c0c;
+    }
+
+    #nav {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    #nav button {
+      margin: 0 5px;
+      padding: 5px 10px;
+    }
+
+    .controls {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .controls button,
+    .controls input[type="color"] {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #4CAF50;
+    }
+
+    #reset-btn {
+      background-color: #f44336;
+      color: white;
+    }
+
+    #reminder-btn {
+      background-color: #2196F3;
+      color: white;
+    }
+
+    .marquee-container {
+      width: 100%;
+      overflow: hidden;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      background-color: #092cf0;
+      color: #fff;
+      padding: 10px 0;
+      z-index: 1000;
+    }
+
+    .marquee-text {
+      display: inline-block;
+      white-space: nowrap;
+      animation: scrollText 15s linear infinite;
+      font-weight: bold;
+      padding-left: 100%;
+    }
+
+    @keyframes scrollText {
+      0% {
+        transform: translateX(0%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Progress Calendar Tracker</h1>
+
+  <div id="nav">
+    <button onclick="changeMonth(-1)">← Prev</button>
+    <span id="monthYear"></span>
+    <button onclick="changeMonth(1)">Next →</button>
+  </div>
+
+  <div class="calendar" id="calendar-header">
+    <div class="calendar-header">Sun</div>
+    <div class="calendar-header">Mon</div>
+    <div class="calendar-header">Tue</div>
+    <div class="calendar-header">Wed</div>
+    <div class="calendar-header">Thu</div>
+    <div class="calendar-header">Fri</div>
+    <div class="calendar-header">Sat</div>
+  </div>
+
+  <div class="calendar" id="calendar-body"></div>
+
+  <div id="streak">Total Completed Days: 0</div>
+
+  <div class="controls">
+    <label for="colorPicker">Choose marker color:</label>
+    <input type="color" id="colorPicker" value="#0733f8" />
+    <br />
+    <button id="reset-btn">Reset Streak</button>
+    <button id="reminder-btn">Enable Daily Reminder</button>
+  </div>
+
+  <div class="marquee-container">
+    <div class="marquee-text">
+      🌟 EVERY DAY IS A STEP FORWARD KEEPING WINING CHAMPE YOU CAN MAKE IT HAPPEN. DON'T GIVE UP KEEP PUSHING FORWARD🌟
+    </div>
+  </div>
+
+  <script>
+    const calendarBody = document.getElementById('calendar-body');
+    const monthYearLabel = document.getElementById('monthYear');
+    const streakDisplay = document.getElementById('streak');
+    const resetBtn = document.getElementById('reset-btn');
+    const reminderBtn = document.getElementById('reminder-btn');
+    const colorPicker = document.getElementById('colorPicker');
+
+    let progress = JSON.parse(localStorage.getItem('calendarProgress')) || {};
+    let currentDate = new Date();
+
+    function formatDate(date) {
+      return date.toISOString().split('T')[0];
+    }
+
+    function renderCalendar() {
+      calendarBody.innerHTML = '';
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+
+      const startDay = firstDay.getDay();
+      const totalDays = lastDay.getDate();
+
+      monthYearLabel.textContent = `${firstDay.toLocaleString('default', { month: 'long' })} ${year}`;
+
+      for (let i = 0; i < startDay; i++) {
+        const blank = document.createElement('div');
+        blank.classList.add('day', 'inactive');
+        calendarBody.appendChild(blank);
+      }
+
+      for (let day = 1; day <= totalDays; day++) {
+        const date = new Date(year, month, day);
+        const dateStr = formatDate(date);
+
+        const cell = document.createElement('div');
+        cell.classList.add('day');
+        cell.textContent = day;
+
+        if (progress[dateStr]) {
+          cell.style.backgroundColor = progress[dateStr];
+          cell.style.color = "#fff";
+        }
+
+        cell.addEventListener('click', () => {
+          if (cell.classList.contains('inactive')) return;
+
+          const selectedColor = colorPicker.value;
+
+          if (progress[dateStr] === selectedColor) {
+            delete progress[dateStr]; // toggle off
+          } else {
+            progress[dateStr] = selectedColor;
+          }
+
+          saveProgress();
+          renderCalendar();
+          updateStreak();
+        });
+
+        calendarBody.appendChild(cell);
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem('calendarProgress', JSON.stringify(progress));
+    }
+
+    function updateStreak() {
+      let doneColor = '#0733f8'; // The specific color you consider as DONE
+      let doneCount = 0;
+      let affectedCount = 0;
+
+      for (let date in progress) {
+        if (progress[date].toLowerCase() === doneColor.toLowerCase()) {
+          doneCount++;
+        } else {
+          affectedCount++;
+        }
+      }
+
+      streakDisplay.innerHTML = `
+        <div>STREAKS (DONE): <strong>${doneCount}</strong></div>
+        <div>STREAKS (AFFECTED): <strong>${affectedCount}</strong></div>
+      `;
+    }
+
+    function changeMonth(offset) {
+      currentDate.setMonth(currentDate.getMonth() + offset);
+      renderCalendar();
+    }
+
+    resetBtn.addEventListener('click', () => {
+      if (confirm('Reset all progress?')) {
+        progress = {};
+        saveProgress();
+        renderCalendar();
+        updateStreak();
+      }
+    });
+
+    reminderBtn.addEventListener('click', () => {
+      if (!("Notification" in window)) {
+        alert("Browser doesn't support notifications.");
+      } else if (Notification.permission === "granted") {
+        scheduleDailyReminder();
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") scheduleDailyReminder();
+        });
+      }
+    });
+
+    function scheduleDailyReminder() {
+      alert("Daily reminder enabled! Keep this app open to receive notifications.");
+      sendNotification();
+      setInterval(sendNotification, 86400000); // 24 hours
+    }
+
+    function sendNotification() {
+      new Notification("Progress Tracker Reminder", {
+        body: "Remember to mark your calendar today!",
+        icon: "icons/profile.png"
+      });
+    }
+
+    renderCalendar();
+    updateStreak();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log("Service Worker Registered"));
+    }
+  </script>
+</body>
+</html>
